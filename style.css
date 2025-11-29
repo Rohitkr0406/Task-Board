@@ -1,0 +1,354 @@
+:root {
+	--bg-color: #e2e8f0;
+	--text-color: #404040;
+	--primary-color: #475569;
+	--column-color: #cbd5e1;
+	--secondary-color: #8ea0b6;
+	--task-color: #f6f6f6;
+	--cancel-color: #e5e7eb;
+	--confirm-color: #dc2626;
+	--confirm-hover-color: #b91c1c;
+	--task-size: 48px;
+	--menu-color: #8a96a7;
+}
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: 'Poppins', sans-serif;
+	background-color: var(--bg-color);
+	color: var(--text-color);
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 20px;
+}
+
+.container {
+	width: 90%;
+	max-width: 1200px;
+	margin-bottom: 20px;
+}
+
+.header {
+	text-align: center;
+	margin-bottom: 40px;
+}
+
+.columns {
+	display: flex;
+	justify-content: space-between;
+	gap: 20px;
+	height: calc(100vh - 160px);
+	max-width: 1200px;
+	flex-wrap: wrap;
+	align-items: flex-start;
+
+	/* Responsive adjustments */
+	@media (max-width: 900px) {
+		.columns {
+			height: auto;
+			gap: 16px;
+		}
+
+		.column {
+			flex: 1 1 48%;
+			/* two columns on tablets */
+			min-width: 320px;
+			max-height: none;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.columns {
+			flex-direction: column;
+			gap: 12px;
+		}
+
+		.column {
+			flex: 1 1 100%;
+			/* single column on phones */
+			min-width: 0;
+			max-height: none;
+		}
+	}
+}
+
+.column {
+	border-radius: 8px;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	max-height: 80vh;
+
+}
+
+.column-title {
+	background-color: var(--primary-color);
+	color: white;
+	padding: 10px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
+}
+
+.tasks {
+	background-color: var(--column-color);
+	flex: 1;
+	padding: 10px;
+	overflow-y: auto;
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+
+.column-title h2 {
+	font-size: 1.2em;
+}
+
+.column-title h2::after {
+	content: attr(data-tasks);
+	font-size: 0.8em;
+	background-color: var(--bg-color);
+	color: var(--text-color);
+	border-radius: 5px;
+	padding: 2px 8px;
+	margin-left: 8px;
+}
+
+.column-title button {
+	background: none;
+	border: none;
+	color: white;
+	font-size: 1.2em;
+	cursor: pointer;
+}
+
+.tasks>.task {
+	background-color: var(--task-color);
+	padding: 10px;
+	margin-bottom: 10px;
+	border-radius: 6px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: start;
+	cursor: grab;
+	gap: 10px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	transition: all 0.2s ease-in-out;
+}
+
+.task:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.task p {
+	flex: 1;
+	margin-right: 10px;
+}
+
+.task menu {
+	align-self: flex-end;
+	display: flex;
+}
+
+.task button {
+	background: none;
+	border: none;
+	color: var(--text-color);
+	font-size: 1em;
+	cursor: pointer;
+	margin-left: 5px;
+}
+
+/* Ensure menu buttons and their icons use the menu color, overriding the generic .task button color */
+.task menu button,
+.task menu button i {
+	color: var(--menu-color);
+}
+
+.task.dragging {
+	box-shadow: none;
+	opacity: 0.5;
+	background-color: var(--secondary-color);
+}
+
+.task.dragging * {
+	visibility: hidden;
+}
+
+.task:not(.dragging):hover {
+	background-color: var(--task-color);
+}
+
+.task-input {
+	background-color: var(--task-color);
+	padding: 10px;
+	margin-top: 10px;
+	border-radius: 6px;
+	overflow-wrap: break-word;
+	min-height: var(--task-size);
+	cursor: text;
+	padding-left: 2.5rem;
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	line-height: 1.2;
+}
+
+.task-input::before {
+	/* Font Awesome pseudo-element glyph (solid) */
+	content: "\f0ae";
+	font-family: "Font Awesome 6 Free";
+	font-weight: 900;
+	position: absolute;
+	left: 0.875rem;
+	top: 50%;
+	transform: translateY(-50%);
+	opacity: 0.6;
+	pointer-events: none;
+	font-size: 1.1rem;
+	line-height: 1;
+	color: var(--menu-color);
+}
+
+.task-input:empty::after {
+	font-family: "Poppins", sans-serif;
+	font-weight: 400;
+	content: attr(data-placeholder);
+	opacity: 0.6;
+	color: gray;
+	align-self: center;
+	pointer-events: none;
+}
+
+.task-input:focus {
+	outline: 2px solid var(--secondary-color);
+}
+
+.confirm-modal[open] {
+	opacity: 1;
+	transform: translate(-50%, -50%) translateY(0);
+	pointer-events: auto;
+}
+
+.confirm-modal::backdrop {
+	background: rgba(0, 0, 0, 0);
+	backdrop-filter: none;
+	transition: all 0.3s;
+	transition-behavior: allow-discrete;
+}
+
+@starting-style {
+	.confirm-modal[open]::backdrop {
+		background: rgba(0, 0, 0, 0);
+		backdrop-filter: blur(2px);
+	}
+
+	.confirm-modal[open] {
+		opacity: 0;
+		transform: translate(-50%, -50%) translateY(50px);
+		pointer-events: auto;
+	}
+}
+
+.confirm-modal {
+	opacity: 1;
+	opacity: 0;
+	pointer-events: none;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%) translateY(50px);
+	border: none;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	transition: all 0.3s;
+	transition-behavior: allow-discrete;
+}
+
+
+.confirm-modal form {
+	padding: 2rem;
+}
+
+.confirm-modal form>*:not(:last-child) {
+	margin-bottom: 1.5rem;
+}
+
+.confirm-modal .preview {
+	font-size: 0.875rem;
+	padding-left: 1.4rem;
+	border-left: 4px solid var(--secondary-color);
+	min-height: var(--task-size);
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.confirm-modal menu {
+	display: flex;
+	justify-content: flex-end;
+	gap: 1rem;
+}
+
+.confirm-modal menu button {
+	background: none;
+	padding: 0.5rem 0.75rem;
+	font-size: 1em;
+	cursor: pointer;
+	font-family: "Poppins", sans-serif;
+	border: 1px solid transparent;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	border-radius: 6px;
+}
+
+.confirm-modal menu button#cancel {
+	border-color: var(--cancel-color);
+}
+
+.confirm-modal menu button#cancel:hover {
+	background-color: var(--cancel-color);
+}
+
+.confirm-modal menu button#confirm {
+	background-color: var(--confirm-color);
+	color: white;
+	border-color: var(--confirm-color);
+}
+
+.confirm-modal menu button#confirm:hover {
+	background-color: var(--confirm-hover-color);
+	border-color: var(--confirm-hover-color);
+}
+
+/* Remove default thick browser outline and use a thin, colored focus ring instead */
+.confirm-modal menu button:focus {
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(71, 85, 105, 0.12);
+	/* subtle neutral ring */
+	border-color: rgba(71, 85, 105, 0.3);
+}
+
+/* Specific focus styles for cancel/confirm to control color and thickness */
+.confirm-modal menu button#cancel:focus {
+	box-shadow: 0 0 0 3px rgba(142, 160, 182, 0.18);
+	/* light bluish ring */
+	border-color: var(--secondary-color);
+}
+
+.confirm-modal menu button#confirm:focus {
+	box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.18);
+	/* subtle red ring */
+	border-color: var(--confirm-hover-color);
+}
